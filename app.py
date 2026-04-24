@@ -38,9 +38,9 @@ def create_app() -> Flask:
         }
 
         analytics = {
-            "response_rate": calculate_response_rate(conn),
-            "interview_rate": calculate_interview_rate(conn),
-            "offer_rate": calculate_offer_rate(conn),
+            "response_rate": 0,
+            "interview_rate": 0,
+            "offer_rate": 0,
         }
         conn.close()
         return render_template("index.html", applications=applications, stats=stats, analytics=analytics)
@@ -143,3 +143,15 @@ def create_app() -> Flask:
             imported_count, skipped_rows = import_excel_file(str(save_path))
             flash(f"Imported {imported_count} row(s). Skipped {skipped_rows} row(s).")
             return redirect(url_for("index"))
+        
+        return render_template("import.html")
+    return app
+
+def open_browser():
+    webbrowser.open("http://127.0.0.1:5000")
+
+if __name__ == "__main__":
+    app = create_app()
+    threading.Timer(1.5, open_browser).start()
+    app.run(debug=True)
+    app.run(debug=True)
