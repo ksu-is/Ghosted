@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ 'Edit Application' if application else 'Add Application' }}</h2>
+<form method="POST" class="form-grid">
+    <label>Company
+        <input type="text" name="company" value="{{ application.company if application else '' }}" required>
+    </label>
+    <label>Role
+        <input type="text" name="role" value="{{ application.role if application else '' }}" required>
+    </label>
+    <label>Location
+        <input type="text" name="location" value="{{ application.location if application else '' }}">
+    </label>
+    <label>Date Applied
+        <input type="date" name="date_applied" value="{{ application.date_applied if application else '' }}">
+    </label>
+    <label>Status
+        <select name="status">
+            {% set current_status = application.status if application else 'Applied' %}
+            {% for option in ['Interested', 'Applied', 'Interviewing', 'Final Round', 'Offer', 'Rejected'] %}
+                <option value="{{ option }}" {% if current_status == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Interview Date
+        <input type="date" name="interview_date" value="{{ application.interview_date if application else '' }}">
+    </label>
+    <label>Follow Up Date
+        <input type="date" name="follow_up_date" value="{{ application.follow_up_date if application else '' }}">
+    </label>
+    <label>Offer Status
+        <select name="offer_status">
+            {% set current_offer = application.offer_status if application else 'Pending' %}
+            {% for option in ['Pending', 'Received', 'Accepted', 'Declined', 'N/A'] %}
+                <option value="{{ option }}" {% if current_offer == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label class="full-width">Notes
+        <textarea name="notes" rows="5">{{ application.notes if application else '' }}</textarea>
+    </label>
+    <button class="button" type="submit">Save Application</button>
+</form>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Import Applications from Excel</h2>
+<p>Upload an <strong>.xlsx</strong> file. Expected columns can include: company, role or position, location, date_applied, status, interview_date, follow_up_date, offer_status, notes.</p>
+
+<form method="POST" enctype="multipart/form-data" class="upload-box">
+    <input type="file" name="excel_file" accept=".xlsx" required>
+    <button class="button" type="submit">Import File</button>
+</form>
+{% endblock %}
