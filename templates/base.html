@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ghosted</title>
-    <<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2">>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
+
     <nav>
         <h1><a href="{{ url_for('index') }}">Ghosted</a></h1>
+
         <div class="nav-links">
             <a href="{{ url_for('index') }}">Dashboard</a>
             <a href="{{ url_for('add_application') }}">Add Application</a>
             <a href="{{ url_for('import_excel') }}">Import Excel</a>
-         <main>
-    {% block content %}
-    {% endblock %}
-</main>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>
