@@ -1,31 +1,36 @@
-from datetime import datetime
 from openpyxl import load_workbook
-
 from db import get_db_connection
 
-EXPECTED_COLUMNS = {
-    "company": "company",
-    "position": "role",
-    "role": "role",
-    "location": "location",
-    "date_applied": "date_applied",
-    "status": "status",
-    "interview_date": "interview_date",
-    "follow_up_date": "follow_up_date",
-    "offer_status": "offer_status",
-    "notes": "notes",
-}
+
+def clean_value(value):
+    if value is None:
+        return ""
+    return str(value).strip()
 
 
-workbook = load_workbook(file_path, data_only=True)
+def normalize_status(status):
+    status = clean_value(status).lower()
 
-if "All" in workbook.sheetnames:
-    sheet = workbook["All"]
-else:
-    sheet = workbook.active
+    if status == "rejected":
+        return "Rejected"
+    elif status in ["offer", "offered"]:
+        return "Offer"
+    elif status in ["interviewing", "interview"]:
+        return "Interviewing"
+    else:
+        return "Applied"
 
-    header_row = [clean_header(cell.value) for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
-    column_map = map_columns(header_row)
+
+def import_excel_file(file_path):
+    workbook = load_workbook(file_path, data_only=True)
+
+    # ONLY use the "All" sheet
+    if "All" in workbook.sheetnames:
+        sheet = workbook["All"]
+    else:
+        sheet = workbook.active
+
+    headers = [clean_value(cell.value) for cell in sheet[1]]
 
     imported_count = 0
     skipped_rows = 0
@@ -33,10 +38,27 @@ else:
     conn = get_db_connection()
 
     for row in sheet.iter_rows(min_row=2, values_only=True):
-        row_data = build_row_dict(row, column_map)
-        if not row_data.get("company") or not row_data.get("role"):
+        data = dict(zip(headers, row))
+
+        company = clean_value(data.get("Company"))
+        role = clean_value(data.get("Position"))
+        location = clean_value(data.get("Location"))
+        response = clean_value(data.get("Response"))
+        interview = clean_value(data.get("Interview"))
+        status = normalize_status(data.get("Status"))
+
+        # skip empty rows
+        if not company and not role:
             skipped_rows += 1
             continue
+
+        notes = f"Response: {response}" if response else ""
+
+        offer_status = "Pending"
+        if status == "Offer":
+            offer_status = "Offer Received"
+        elif status == "Rejected":
+            offer_status = "Rejected"
 
         conn.execute(
             """
@@ -45,55 +67,21 @@ else:
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                row_data.get("company", ""),
-                row_data.get("role", ""),
-                row_data.get("location", ""),
-                normalize_date(row_data.get("date_applied")),
-                row_data.get("status", "Applied") or "Applied",
-                normalize_date(row_data.get("interview_date")),
-                normalize_date(row_data.get("follow_up_date")),
-                row_data.get("offer_status", "Pending") or "Pending",
-                row_data.get("notes", ""),
+                company,
+                role,
+                location,
+                "",
+                status,
+                interview,
+                "",
+                offer_status,
+                notes,
             ),
         )
+
         imported_count += 1
 
     conn.commit()
     conn.close()
-    workbook.close()
+
     return imported_count, skipped_rows
-
-
-def clean_header(value) -> str:
-    if value is None:
-        return ""
-    return str(value).strip().lower().replace(" ", "_")
-
-
-def map_columns(headers: list[str]) -> dict[int, str]:
-    result = {}
-    for index, header in enumerate(headers):
-        if header in EXPECTED_COLUMNS:
-            result[index] = EXPECTED_COLUMNS[header]
-    return result
-
-
-def build_row_dict(row: tuple, column_map: dict[int, str]) -> dict[str, str]:
-    result = {}
-    for index, field_name in column_map.items():
-        value = row[index] if index < len(row) else ""
-        result[field_name] = "" if value is None else str(value).strip()
-    return result
-
-
-def normalize_date(value) -> str:
-    if not value:
-        return ""
-
-    text = str(value).strip()
-    for pattern in ("%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y"):
-        try:
-            return datetime.strptime(text, pattern).strftime("%Y-%m-%d")
-        except ValueError:
-            continue
-    return text
