@@ -142,6 +142,13 @@ def create_app() -> Flask:
             save_path = UPLOAD_FOLDER / filename
             uploaded_file.save(save_path)
 
+            conn = get_db_connection()
+            conn.execute("DELETE FROM applications")
+            conn.commit()
+            conn.close()
+
+            imported_count, skipped_rows = import_excel_file(str(save_path))
+
             imported_count, skipped_rows = import_excel_file(str(save_path))
             flash(f"Imported {imported_count} row(s). Skipped {skipped_rows} row(s).")
             return redirect(url_for("index"))

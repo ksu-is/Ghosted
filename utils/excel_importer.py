@@ -17,8 +17,11 @@ EXPECTED_COLUMNS = {
 }
 
 
-def import_excel_file(file_path: str) -> tuple[int, int]:
-    workbook = load_workbook(filename=file_path)
+workbook = load_workbook(file_path, data_only=True)
+
+if "All" in workbook.sheetnames:
+    sheet = workbook["All"]
+else:
     sheet = workbook.active
 
     header_row = [clean_header(cell.value) for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
