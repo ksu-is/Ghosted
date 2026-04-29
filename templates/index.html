@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<h2>Dashboard</h2>
+
 <section class="stats-grid">
     <div class="card"><h3>Total</h3><p>{{ stats.total }}</p></div>
     <div class="card"><h3>Applied</h3><p>{{ stats.applied }}</p></div>
@@ -8,4 +11,40 @@
     <div class="card"><h3>Offers</h3><p>{{ stats.offer }}</p></div>
     <div class="card"><h3>Rejected</h3><p>{{ stats.rejected }}</p></div>
 </section>
+
+<h2>Applications</h2>
+
+<table>
+    <tr>
+        <th>Company</th>
+        <th>Position</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th>Interview</th>
+        <th>Notes</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for app in applications %}
+    <tr>
+        <td>{{ app.company }}</td>
+        <td>{{ app.role }}</td>
+        <td>{{ app.location }}</td>
+        <td>{{ app.status }}</td>
+        <td>{{ app.interview_date }}</td>
+        <td>{{ app.notes }}</td>
+        <td>
+            <a href="{{ url_for('edit_application', app_id=app.id) }}">Edit</a>
+            <form method="POST" action="{{ url_for('delete_application', app_id=app.id) }}" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="7">No applications yet. Add one or import your Excel file.</td>
+    </tr>
+    {% endfor %}
+</table>
+
 {% endblock %}
