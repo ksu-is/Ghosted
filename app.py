@@ -13,6 +13,8 @@ BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_FOLDER = BASE_DIR / "uploads"
 ALLOWED_EXTENSIONS = {"xlsx"}
 
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -154,4 +156,4 @@ if __name__ == "__main__":
     app = create_app()
     threading.Timer(1.5, open_browser).start()
     app.run(debug=True)
-    app.run(debug=True)
+    
