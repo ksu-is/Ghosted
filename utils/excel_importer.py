@@ -46,6 +46,11 @@ def import_excel_file(file_path):
 
     conn = get_db_connection()
 
+    conn.execute("DELETE FROM applications")
+    conn.commit()
+    
+    seen_rows = set()
+
     for row in sheet.iter_rows(min_row=2, values_only=True):
         data = dict(zip(headers, row))
 
@@ -60,6 +65,7 @@ def import_excel_file(file_path):
         if not company and not role:
             skipped_rows += 1
             continue
+
         row_key = (company, role, location, response, interview, status)
 
         if row_key in seen_rows:

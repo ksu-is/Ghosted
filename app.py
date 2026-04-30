@@ -122,7 +122,7 @@ def create_app() -> Flask:
     @app.route("/delete/<int:app_id>", methods=["POST"])
     def delete_application(app_id: int):
         conn = get_db_connection()
-        conn.execute("DELETE FROM applications")
+        conn.execute("DELETE FROM applications WHERE id = ?", (app_id,))
         conn.commit()
         conn.close()
         flash("Application deleted.")
