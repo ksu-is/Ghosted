@@ -116,11 +116,13 @@ def create_app() -> Flask:
 
         conn.close()
         return render_template("form.html", application=application)
+    
+    print("CLEARING DATABASE BEFORE IMPORT")
 
     @app.route("/delete/<int:app_id>", methods=["POST"])
     def delete_application(app_id: int):
         conn = get_db_connection()
-        conn.execute("DELETE FROM applications WHERE id = ?", (app_id,))
+        conn.execute("DELETE FROM applications")
         conn.commit()
         conn.close()
         flash("Application deleted.")
@@ -150,11 +152,14 @@ def create_app() -> Flask:
             imported_count, skipped_rows = import_excel_file(str(save_path))
 
             imported_count, skipped_rows = import_excel_file(str(save_path))
+            print("IMPORTED:", imported_count)
+            print("SKIPPED:", skipped_rows)
             flash(f"Imported {imported_count} row(s). Skipped {skipped_rows} row(s).")
             return redirect(url_for("index"))
         
         return render_template("import.html")
     return app
+
 
 def open_browser():
     webbrowser.open("http://127.0.0.1:5000")

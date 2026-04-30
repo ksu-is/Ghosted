@@ -8,23 +8,29 @@ def clean_value(value):
     return str(value).strip()
 
 
-def normalize_status(status):
+def normalize_status(status, interview):
     status = clean_value(status).lower()
+    interview = clean_value(interview).lower()
 
     if status == "rejected":
         return "Rejected"
-    elif status in ["offer", "offered"]:
+
+    if status in ["offer", "offered"]:
         return "Offer"
-    elif status in ["interviewing", "interview"]:
+
+    if status in ["interviewing", "interview"]:
         return "Interviewing"
-    else:
-        return "Applied"
+
+    # If status is blank but interview column has a round, count as interviewing
+    if interview:
+        return "Interviewing"
+
+    return "Applied"
 
 
 def import_excel_file(file_path):
     workbook = load_workbook(file_path, data_only=True)
 
-    # ONLY use the "All" sheet
     if "All" in workbook.sheetnames:
         sheet = workbook["All"]
     else:
@@ -45,7 +51,7 @@ def import_excel_file(file_path):
         location = clean_value(data.get("Location"))
         response = clean_value(data.get("Response"))
         interview = clean_value(data.get("Interview"))
-        status = normalize_status(data.get("Status"))
+        status = normalize_status(data.get("Status"), data.get("Interview"))
 
         # skip empty rows
         if not company and not role:
