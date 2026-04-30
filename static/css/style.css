@@ -53,3 +53,47 @@ nav a {
 .analytics-grid .card p {
     font-size: 1.2rem;
 }
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* adds vertical spacing between rows */
+}
+
+td, th {
+    padding: 10px 15px;
+    text-align: left;
+}
+ td:last-child {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* space between Edit and Delete */
+}
+
+td form {
+    display: inline;
+}
+
+td button {
+    padding: 6px 10px;
+    font-size: 12px;
+    background-color: #b85aee;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+td button:hover {
+    background-color: #ae72d1;
+}
+table {
+    table-layout: auto;
+}
+
+td {
+    max-width: 200px;
+    word-wrap: break-word;
+}
+.table-container {
+    overflow-x: auto;
+}
