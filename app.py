@@ -151,7 +151,6 @@ def create_app() -> Flask:
 
             imported_count, skipped_rows = import_excel_file(str(save_path))
 
-            imported_count, skipped_rows = import_excel_file(str(save_path))
             print("IMPORTED:", imported_count)
             print("SKIPPED:", skipped_rows)
             flash(f"Imported {imported_count} row(s). Skipped {skipped_rows} row(s).")
@@ -167,5 +166,6 @@ def open_browser():
 if __name__ == "__main__":
     app = create_app()
     threading.Timer(1.5, open_browser).start()
+
     app.run(debug=True)
     

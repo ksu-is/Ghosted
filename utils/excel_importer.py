@@ -36,6 +36,9 @@ def import_excel_file(file_path):
     else:
         sheet = workbook.active
 
+    print("IMPORTING SHEET:", sheet.title)
+    print("TOTAL EXCEL ROWS:", sheet.max_row)
+
     headers = [clean_value(cell.value) for cell in sheet[1]]
 
     imported_count = 0
@@ -53,10 +56,17 @@ def import_excel_file(file_path):
         interview = clean_value(data.get("Interview"))
         status = normalize_status(data.get("Status"), data.get("Interview"))
 
-        # skip empty rows
+        
         if not company and not role:
             skipped_rows += 1
             continue
+        row_key = (company, role, location, response, interview, status)
+
+        if row_key in seen_rows:
+            skipped_rows += 1
+            continue
+
+        seen_rows.add(row_key)
 
         notes = f"Response: {response}" if response else ""
 
