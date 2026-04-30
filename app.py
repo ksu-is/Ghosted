@@ -34,6 +34,8 @@ def create_app() -> Flask:
         stats = {
             "total": conn.execute("SELECT COUNT(*) FROM applications").fetchone()[0],
             "applied": conn.execute("SELECT COUNT(*) FROM applications").fetchone()[0],
+            "responses": conn.execute("SELECT COUNT(*) FROM applications WHERE notes != ''").fetchone()[0],
+            "ghosted": conn.execute("SELECT COUNT(*) FROM applications WHERE notes = '' OR notes IS NULL").fetchone()[0],
             "interviewing": conn.execute("SELECT COUNT(*) FROM applications WHERE status = 'Interviewing'").fetchone()[0],
             "offer": conn.execute("SELECT COUNT(*) FROM applications WHERE status = 'Offer'").fetchone()[0],
             "rejected": conn.execute("SELECT COUNT(*) FROM applications WHERE status = 'Rejected'").fetchone()[0],
